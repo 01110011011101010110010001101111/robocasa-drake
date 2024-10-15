@@ -44,24 +44,10 @@ from robocasa.utils.texture_swap import (
 )
 
 from robocasa.drake_conversion.just_geom_conversion import convert_geoms_to_obj
-from robocasa.drake_conversion.auto_texture import execute
-
-
-REGISTERED_KITCHEN_ENVS = {}
-
-
-def register_kitchen_env(target_class):
-    REGISTERED_KITCHEN_ENVS[target_class.__name__] = target_class
-
-
-class KitchenEnvMeta(EnvMeta):
-    """Metaclass for registering robocasa environments"""
-
-    def __new__(meta, name, bases, class_dict):
-        cls = super().__new__(meta, name, bases, class_dict)
-        register_kitchen_env(cls)
-        return cls
-
+# from robocasa.drake_conversion.auto_texture import execute
+from robocasa.drake_conversion.add_color import execute
+from robocasa.drake_conversion.remove_cab_doors import rm_cab_doors
+from robocasa.drake_conversion.remove_collision import rm_collision
 
 class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
     """
@@ -191,7 +177,6 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
         randomize_cameras (bool): if True, will add gaussian noise to the position and rotation of the
             wrist and agentview cameras
     """
-
     EXCLUDE_LAYOUTS = []
 
     def __init__(
@@ -1118,7 +1103,9 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
             f.write(new_xml_str)
 
             # convert_geoms_to_obj(xml_filename)
-            # execute(xml_filename)
+            execute(xml_filename)
+            rm_cab_doors(xml_filename)
+            rm_collision(xml_filename)
             # f.write(result)
 
         return result
