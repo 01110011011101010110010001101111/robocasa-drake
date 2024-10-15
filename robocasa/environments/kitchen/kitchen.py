@@ -36,7 +36,10 @@ from robocasa.utils.texture_swap import (
 import robocasa.macros as macros
 
 from robocasa.drake_conversion.just_geom_conversion import convert_geoms_to_obj
-from robocasa.drake_conversion.auto_texture import execute
+# from robocasa.drake_conversion.auto_texture import execute
+from robocasa.drake_conversion.add_color import execute
+from robocasa.drake_conversion.remove_cab_doors import rm_cab_doors
+from robocasa.drake_conversion.remove_collision import rm_collision
 
 
 class Kitchen(ManipulationEnv):
@@ -801,7 +804,9 @@ class Kitchen(ManipulationEnv):
             f.write(new_xml_str)
 
             # convert_geoms_to_obj(xml_filename)
-            # execute(xml_filename)
+            execute(xml_filename)
+            rm_cab_doors(xml_filename)
+            rm_collision(xml_filename)
             # f.write(result)
 
         return result
