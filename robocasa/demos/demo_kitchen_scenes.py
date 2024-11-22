@@ -109,6 +109,7 @@ if __name__ == "__main__":
         renderer=args.renderer,
     )
 
+    breakpoint()
     # Grab reference to controller config and convert it to json-encoded string
     env_info = json.dumps(config)
 

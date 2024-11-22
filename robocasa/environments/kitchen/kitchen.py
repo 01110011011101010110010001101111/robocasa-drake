@@ -49,6 +49,62 @@ from robocasa.drake_conversion.add_color import execute
 from robocasa.drake_conversion.remove_cab_doors import rm_cab_doors
 from robocasa.drake_conversion.remove_collision import rm_collision
 
+import os
+import random
+import xml.etree.ElementTree as ET
+from copy import deepcopy
+
+import numpy as np
+import robosuite.utils.transform_utils as T
+from robosuite.environments.manipulation.manipulation_env import ManipulationEnv
+from robosuite.models.tasks import ManipulationTask
+from robosuite.utils.errors import RandomizationError
+from robosuite.utils.mjcf_utils import (
+    array_to_string,
+    find_elements,
+    xml_path_completion,
+)
+from robosuite.utils.observables import Observable, sensor
+from robosuite.environments.base import EnvMeta
+from scipy.spatial.transform import Rotation
+
+import robocasa
+import robocasa.macros as macros
+import robocasa.utils.camera_utils as CamUtils
+import robocasa.utils.object_utils as OU
+import robocasa.models.scenes.scene_registry as SceneRegistry
+from robocasa.models.scenes import KitchenArena
+from robocasa.models.fixtures import *
+from robocasa.models.objects.kitchen_object_utils import sample_kitchen_object
+from robocasa.models.objects.objects import MJCFObject
+from robocasa.utils.placement_samplers import (
+    SequentialCompositeSampler,
+    UniformRandomSampler,
+)
+from robocasa.utils.texture_swap import (
+    get_random_textures,
+    replace_cab_textures,
+    replace_counter_top_texture,
+    replace_floor_texture,
+    replace_wall_texture,
+)
+
+
+REGISTERED_KITCHEN_ENVS = {}
+
+
+def register_kitchen_env(target_class):
+    REGISTERED_KITCHEN_ENVS[target_class.__name__] = target_class
+
+
+class KitchenEnvMeta(EnvMeta):
+    """Metaclass for registering robocasa environments"""
+
+    def __new__(meta, name, bases, class_dict):
+        cls = super().__new__(meta, name, bases, class_dict)
+        register_kitchen_env(cls)
+        return cls
+
 class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
     """
     Initialized a Base Kitchen environment.
