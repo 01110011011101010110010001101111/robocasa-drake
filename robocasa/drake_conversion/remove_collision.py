@@ -3,9 +3,6 @@ import re
 
 
 def rm_collision(INPUT_FILE):
-    # Define the regex pattern
-    pattern = re.compile(r"cab_.*door")
-
     # Load the XML file
     tree = ET.parse(INPUT_FILE)
     root = tree.getroot()
@@ -15,7 +12,7 @@ def rm_collision(INPUT_FILE):
 
     # Iterate through all elements in the XML tree
     for elem in root.findall(".//*"):
-        # Check if the element has a "name" attribute and if it contains "cab" and "door"
+        # Remove if it's a collision and one of the red collision geoms
         if ("name" in elem.attrib and "coll" in elem.attrib["name"]) or (
             "rgba" in elem.attrib
             and (
